@@ -1,0 +1,28 @@
+# ── LangChain core ───────────────────────────────────────────────────
+langchain
+langchain-core
+langchain-community
+langchain-groq
+
+# ── Neo4j graph integration ──────────────────────────────────────────
+neo4j
+langchain-neo4j
+
+# ── Groq LLM ─────────────────────────────────────────────────────────
+groq
+
+# ── HuggingFace Embeddings ────────────────────────────────────────────
+sentence-transformers
+langchain-huggingface
+
+# ── Vector store (few-shot selection) ────────────────────────────────
+faiss-cpu
+
+# ── Utilities ────────────────────────────────────────────────────────
+python-dotenv
+pydantic
+loguru
+
+# ── Optional: progress bars ──────────────────────────────────────────
+tqdm
+pymupdf
