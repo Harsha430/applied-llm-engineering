@@ -1,0 +1,82 @@
+[
+  {
+    "query": "What is Attention Is All You Need?",
+    "expected": "It introduces the Transformer architecture, which relies entirely on self-attention mechanisms instead of recurrence or convolution."
+  },
+  {
+    "query": "What problem does the Transformer solve?",
+    "expected": "It improves sequence modeling by removing recurrence and enabling parallelization, reducing training time and improving performance."
+  },
+  {
+    "query": "What is the Transformer architecture?",
+    "expected": "It consists of encoder and decoder stacks built using self-attention and feed-forward layers."
+  },
+  {
+    "query": "What is self-attention?",
+    "expected": "It is a mechanism that allows a model to relate different positions in a sequence to compute representations."
+  },
+  {
+    "query": "Why is self-attention important?",
+    "expected": "It captures long-range dependencies efficiently and allows parallel computation."
+  },
+  {
+    "query": "What is scaled dot-product attention?",
+    "expected": "It computes attention by taking dot products of queries and keys, scaling them, applying softmax, and weighting values."
+  },
+  {
+    "query": "What is multi-head attention?",
+    "expected": "It uses multiple attention heads to capture different representation subspaces simultaneously."
+  },
+  {
+    "query": "What is the role of positional encoding?",
+    "expected": "It injects information about token positions since the model has no recurrence or convolution."
+  },
+  {
+    "query": "Why does the Transformer not use RNNs?",
+    "expected": "Because self-attention allows modeling dependencies without sequential computation, enabling parallelization."
+  },
+  {
+    "query": "What are the main components of each encoder layer?",
+    "expected": "Each layer has a self-attention mechanism followed by a feed-forward network."
+  },
+  {
+    "query": "What are the main components of each decoder layer?",
+    "expected": "Each layer includes masked self-attention, encoder-decoder attention, and a feed-forward network."
+  },
+  {
+    "query": "What is masked self-attention?",
+    "expected": "It prevents the decoder from attending to future tokens during training."
+  },
+  {
+    "query": "What advantage does the Transformer have over RNNs?",
+    "expected": "It enables parallel processing and reduces training time while improving performance."
+  },
+  {
+    "query": "How does attention reduce path length?",
+    "expected": "It allows direct connections between all positions in a sequence, reducing dependency distance."
+  },
+  {
+    "query": "What tasks was the Transformer evaluated on?",
+    "expected": "Machine translation tasks such as English-to-German and English-to-French."
+  },
+  {
+    "query": "What is the significance of multi-head attention?",
+    "expected": "It allows the model to focus on different parts of the sequence simultaneously."
+  },
+  {
+    "query": "What is the feed-forward network in Transformer?",
+    "expected": "It is a position-wise fully connected network applied after attention layers."
+  },
+  {
+    "query": "Why is positional encoding necessary?",
+    "expected": "Because the model does not inherently understand sequence order."
+  },
+  {
+    "query": "What is the key idea behind the Transformer?",
+    "expected": "Replacing recurrence and convolution with attention mechanisms for sequence modeling."
+  },
+  {
+    "query": "How does the Transformer achieve efficiency?",
+    "expected": "Through parallel computation and reduced sequential dependencies."
+  }
+]
