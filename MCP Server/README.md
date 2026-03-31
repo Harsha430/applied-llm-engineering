@@ -17,25 +17,24 @@ Built with **Python**, **FastMCP**, and **Groq (Llama 3.3-70B)**.
 
 ---
 
-## 🚀 Deployment (Leapcell)
+## 🚀 Deployment (Prefect Horizon)
 
-This server is optimized for deployment on **[Leapcell](https://leapcell.io)** using the **SSE (Server-Sent Events) Transport**.
+This server is optimized for deployment on **[Prefect Horizon](https://horizon.prefect.io/)**, a managed hosting platform for FastMCP.
 
 ### Prerequisites
 
 1.  A **Groq API Key** (for LLM logic).
 2.  A **GitHub API Key** (optional, for higher rate limits on `analyze_github_repo`).
 
-### Leapcell Setup
+### Horizon Setup
 
-1.  **Create a New Service**: Connect your GitHub repository to Leapcell.
+1.  **Connect Repo**: Sign in to [Horizon](https://horizon.prefect.io/) with GitHub and select this repository.
 2.  **Environment Variables**:
     -   `GROQ_API_KEY`: Your Groq API key.
     -   `GITHUB_API_KEY`: (Optional) Your GitHub personal access token.
-3.  **Build Settings**:
-    -   **Build Command**: `pip install -r requirements.txt`
-    -   **Start Command**: `python main.py`
-    -   **Port**: `8080` (Leapcell will provide this via the `$PORT` env var).
+3.  **Entrypoint**:
+    -   Set the entrypoint to: **`main.py:mcp`**
+4.  **Deploy**: Click **Deploy Server**. Horizon will automatically build and host your server.
 
 ---
 
@@ -66,7 +65,7 @@ GITHUB_API_KEY=your_github_token
 python main.py
 ```
 
-The server will start an SSE transport on `http://0.0.0.0:8080/sse` by default.
+The server will start listening on `stdio` by default, which is perfect for **Claude Desktop**.
 
 ---
 

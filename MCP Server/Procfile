@@ -1,1 +1,1 @@
-web: mcp run main.py --transport http --port 8080
+web: mcp run main.py --transport http --port $PORT
