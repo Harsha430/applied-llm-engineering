@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangChain Tool-Based Agent Tutorial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1c;
+            --bg-secondary: #131b2f;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #3b82f6;
+            --glass-bg: rgba(19, 27, 47, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: rgba(139, 92, 246, 0.4);
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: rgba(59, 130, 246, 0.3);
+            bottom: -200px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 30px) scale(1.1); }
+            100% { transform: translate(-30px, 50px) scale(0.9); }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            letter-spacing: -0.05em;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 32px;
+            background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary));
+            border-radius: 4px;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            color: #a5b4fc;
+        }
+
+        .highlight-keyword { color: #c084fc; font-weight: 500; }
+        .highlight-string { color: #86efac; }
+        .highlight-comment { color: #64748b; font-style: italic; }
+        .highlight-decorator { color: #f472b6; }
+        .highlight-class { color: #fbbf24; }
+
+        /* Fancy Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #c4b5fd;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: center;
+            width: max-content;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+
+        /* Numbered Steps */
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+            margin-right: 1rem;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="container">
+        <h1>Agent Playbook</h1>
+        <div class="badge">LangChain Architecture Guide</div>
+
+        <div class="glass-card">
+            <h2>The Architecture</h2>
+            <p>A "ReAct" Agent (Reasoning + Acting) acts as the brain. Instead of just replying to a prompt, it enters a loop: <strong>Think &rarr; Act &rarr; Observe</strong>. To build your own agent with custom capabilities, you only need three core components.</p>
+        </div>
+
+        <div class="glass-card">
+            <h2><span class="step-number">1</span> Creating Custom Tools</h2>
+            <p>Tools are functions the LLM can trigger. The easiest way to create one is using the <code class="highlight-decorator">@tool</code> decorator. <strong>Crucial Rule:</strong> For classic ReAct agents, ensure your tool accepts a <em>single string argument</em> to avoid Pydantic parsing errors.</p>
+            <pre><code><span class="highlight-keyword">from</span> langchain_core.tools <span class="highlight-keyword">import</span> tool
+
+<span class="highlight-decorator">@tool</span>
+<span class="highlight-keyword">def</span> <span class="highlight-class">say_hello</span>(name: <span class="highlight-class">str</span>) -> <span class="highlight-class">str</span>:
+    <span class="highlight-string">"""Greet the user by their name.
+    Input MUST be a simple string representing the name."""</span>
+    <span class="highlight-keyword">return</span> <span class="highlight-string">f"Hello, {name}! I am an Agent."</span>
+
+<span class="highlight-comment"># You can create ANY number of tools like this!</span>
+<span class="highlight-comment"># Examples: database queries, API calls, manipulating files...</span></code></pre>
+            <p>The docstring (the <code>"""Text"""</code> inside the function) is incredibly important. The LLM reads this text to figure out <strong>when</strong> to use the tool and <strong>what</strong> to pass into it.</p>
+        </div>
+
+        <div class="glass-card">
+            <h2><span class="step-number">2</span> Initializing the LLM</h2>
+            <p>The LLM powers the reasoning. In this project, we are using Groq's lightning-fast models. You instantiate it and pass your API key (usually automatically loaded via `.env`).</p>
+            <pre><code><span class="highlight-keyword">from</span> langchain_groq <span class="highlight-keyword">import</span> ChatGroq
+
+<span class="highlight-comment"># Ensure GROQ_API_KEY is defined in your environments!</span>
+llm = ChatGroq(
+    model=<span class="highlight-string">"llama-3.3-70b-versatile"</span>, 
+    temperature=<span class="highlight-keyword">0</span>  <span class="highlight-comment"># 0 keeps the agent's logic deterministic</span>
+)</code></pre>
+        </div>
+
+        <div class="glass-card">
+            <h2><span class="step-number">3</span> The ReAct Loop</h2>
+            <p>Finally, you bind the LLM and the Tools together into an Agent Executor. We use the `<code class="highlight-class">ZERO_SHOT_REACT_DESCRIPTION</code>` pattern, which automatically formats the prompt into the Think/Act/Observe cycle.</p>
+            <pre><code><span class="highlight-keyword">from</span> langchain_classic.agents <span class="highlight-keyword">import</span> initialize_agent, AgentType
+
+<span class="highlight-comment"># 1. Gather tools into a list</span>
+tools = [say_hello, add_numbers, fetch_weather]
+
+<span class="highlight-comment"># 2. Bind them together</span>
+agent_executor = initialize_agent(
+    tools=tools,
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=<span class="highlight-keyword">True</span>,  <span class="highlight-comment"># Prints the Thought Process to the terminal!</span>
+    handle_parsing_errors=<span class="highlight-keyword">True</span>
+)
+
+<span class="highlight-comment"># 3. Ask it a question!</span>
+response = agent_executor.invoke({<span class="highlight-string">"input"</span>: <span class="highlight-string">"Say hello to Harsh"</span>})
+<span class="highlight-keyword">print</span>(response[<span class="highlight-string">"output"</span>])</code></pre>
+        </div>
+        
+        <div class="glass-card">
+            <h2><span class="step-number">4</span> Demystifying the Prompt Variables</h2>
+            <p>If you look at <code>react_loop.py</code>, you'll see a massive ReAct prompt template. Have you wondered how the LLM perfectly tracks all the tools and its previous thoughts? This is handled by four magic variables injected into the prompt during generation:</p>
+            <ul>
+                <li style="margin-bottom: 0.5rem;"><code class="highlight-class">{tools}</code>: LangChain dynamically takes your <code>@tool</code> descriptions and injects them here so the LLM knows exactly what each tool takes as input.</li>
+                <li style="margin-bottom: 0.5rem;"><code class="highlight-class">{tool_names}</code>: A simple comma-separated list of the names of the tools (e.g. <code>add, get_weather</code>) telling the LLM the exact string commands it is allowed to output.</li>
+                <li style="margin-bottom: 0.5rem;"><code class="highlight-class">{input}</code>: The actual question you typed into the terminal.</li>
+                <li style="margin-bottom: 0.5rem;"><strong style="color: var(--accent-primary);">{agent_scratchpad}</strong>: This is the brain's short-term memory! Every time the agent takes an Action and receives an Observation, LangChain appends that interaction onto this scratchpad. On the next loop, the LLM reads the scratchpad and knows what it has already tried so it doesn't get stuck in an infinite loop!</li>
+            </ul>
+        </div>
+        
+        <div class="glass-card">
+            <h2>Summary: Sky is the Limit 🚀</h2>
+            <p>To add a new capability to your bot, all you need to do is write a standard Python function, decorate it with <code class="highlight-decorator">@tool</code>, provide a clear docstring, and append it to your <code>tools = [...]</code> list. The LLM will automatically learn how to use it contextually based on your docstring!</p>
+        </div>
+    </div>
+</body>
+</html>

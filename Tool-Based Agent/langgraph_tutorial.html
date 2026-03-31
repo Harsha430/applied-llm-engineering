@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph Migration Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #064e3b;
+            --bg-secondary: #065f46;
+            --text-primary: #ecfdf5;
+            --text-secondary: #a7f3d0;
+            --accent-primary: #10b981;
+            --accent-secondary: #34d399;
+            --glass-bg: rgba(6, 78, 59, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: float 25s infinite alternate ease-in-out;
+        }
+
+        .orb-1 {
+            width: 450px; height: 450px;
+            background: rgba(16, 185, 129, 0.5); /* Emerald */
+            top: -50px; left: -100px;
+        }
+
+        .orb-2 {
+            width: 550px; height: 550px;
+            background: rgba(59, 130, 246, 0.4); /* Blue */
+            bottom: -150px; right: -50px;
+            animation-delay: -7s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 40px) scale(1.05); }
+            100% { transform: translate(-40px, 60px) scale(0.95); }
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        h1 {
+            font-size: 3.5rem; font-weight: 800; margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, #6ee7b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center; letter-spacing: -0.05em;
+        }
+
+        h2 {
+            font-size: 2rem; font-weight: 600; margin-bottom: 1.5rem;
+            color: #fff; display: flex; align-items: center; gap: 0.75rem;
+        }
+
+        h2::before {
+            content: ''; display: block; width: 8px; height: 32px;
+            background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary));
+            border-radius: 4px;
+        }
+
+        p { margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 1.1rem; }
+        
+        ul { margin-bottom: 1.5rem; padding-left: 2rem; color: var(--text-secondary); font-size: 1.1rem; }
+        li { margin-bottom: 0.75rem; }
+        strong { color: #fff; }
+
+        pre {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 1.5rem;
+            overflow-x: auto; margin-bottom: 1.5rem;
+        }
+
+        code { font-family: 'Fira Code', monospace; font-size: 0.95rem; color: #a7f3d0; }
+        .keyword { color: #f472b6; font-weight: 500; }
+        .string { color: #fcd34d; }
+        .comment { color: #9ca3af; font-style: italic; }
+        .class { color: #38bdf8; }
+
+        .badge {
+            display: inline-block; padding: 0.3rem 1rem;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.2));
+            border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 999px;
+            font-size: 0.9rem; font-weight: 700; color: #6ee7b7;
+            margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 0.05em;
+            text-align: center; width: max-content; margin-left: auto; margin-right: auto; display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="container">
+        <h1>LangGraph Revolution</h1>
+        <div class="badge">Migrating from AgentExecutor</div>
+
+        <div class="glass-card">
+            <h2>Why LangGraph? The Problem it Solves</h2>
+            <p>In our current project, we use the classic <code>AgentExecutor</code>. While easy to set up, it acts like a "black box" engine. It forces the LLM to output a specific text format (Thought/Action/Observation) via a gigantic prompt template (`{agent_scratchpad}`).</p>
+            <p><strong>The Core Issues with Classic ReAct:</strong></p>
+            <ul>
+                <li><strong>No Absolute Control:</strong> If the agent gets stuck in an infinite loop calling the same tool over and over, you can't easily intervene.</li>
+                <li><strong>Prompt Hacking:</strong> It relies entirely on string-parsing ("Thought:", "Action:") which frequently breaks (giving <i>Parsing Errors</i>) if the LLM slightly deviates from the text format.</li>
+                <li><strong>Brittle Memory:</strong> The `{agent_scratchpad}` grows exponentially, eventually overflowing the context window on long tasks.</li>
+            </ul>
+            <p><strong>LangGraph solves this entirely</strong> by moving memory to a concrete variable (a <i>State</i>) and making the reasoning loop a literal flowchart (a <i>Graph</i>) with explicit nodes and edges.</p>
+        </div>
+
+        <div class="glass-card">
+            <h2>What Can We Do With LangGraph?</h2>
+            <p>By mapping out execution as a stateful graph, LangGraph unlocks insane, enterprise-level capabilities that are practically impossible in standard ReAct loops:</p>
+            <ul>
+                <li><strong>Human-in-the-Loop (HITL):</strong> You can pause execution right before a risky tool (like "Delete Database_Record") runs, ask the human for permission via the UI, and then resume the graph exactly where it left off!</li>
+                <li><strong>Multi-Agent Orquestration:</strong> You can create complex hierarchies where a "Researcher Agent" builds a report and passes the raw state data to a "Reviewer Agent" who grades it.</li>
+                <li><strong>Time Travel:</strong> Because the graph saves its `State` at every single node safely into a database (via Checkpointers), you can rewind a conversation, change what happened at step 3, and branch off a new reality.</li>
+            </ul>
+        </div>
+
+        <div class="glass-card">
+            <h2>How to Migrate Our Project</h2>
+            <p>Here is what the exact equivalent of our `react_loop.py` looks like flawlessly rewritten in LangGraph. Notice there are <strong>zero giant string prompt templates</strong>. It relies natively on OpenAI/Groq's modern Tool-Calling JSON APIs.</p>
+            <pre><code><span class="keyword">from</span> typing <span class="keyword">import</span> Annotated
+<span class="keyword">from</span> typing_extensions <span class="keyword">import</span> TypedDict
+<span class="keyword">from</span> langgraph.graph <span class="keyword">import</span> StateGraph, START, END
+<span class="keyword">from</span> langgraph.graph.message <span class="keyword">import</span> add_messages
+<span class="keyword">from</span> langgraph.prebuilt <span class="keyword">import</span> ToolNode, tools_condition
+<span class="keyword">from</span> langchain_groq <span class="keyword">import</span> ChatGroq
+<span class="keyword">from</span> tools.calculator <span class="keyword">import</span> add, sub, mul, div
+<span class="keyword">from</span> tools.search <span class="keyword">import</span> search_web
+<span class="keyword">from</span> tools.api_tool <span class="keyword">import</span> get_weather
+
+<span class="comment"># 1. Define the Global State (just a list of messages being passed around)</span>
+<span class="keyword">class</span> <span class="class">State</span>(TypedDict):
+    messages: Annotated[<span class="class">list</span>, add_messages]
+
+<span class="comment"># 2. Setup LLM and Bind Tools Natively</span>
+tools = [add, sub, mul, div, search_web, get_weather]
+llm = ChatGroq(model=<span class="string">"llama-3.3-70b-versatile"</span>, temperature=<span class="class">0</span>)
+llm_with_tools = llm.bind_tools(tools)
+
+<span class="comment"># 3. Create the Agent Node Function</span>
+<span class="keyword">def</span> <span class="class">agent_node</span>(state: State):
+    <span class="comment"># The LLM reads the history, decides to chat OR output a tool_call!</span>
+    response = llm_with_tools.invoke(state[<span class="string">"messages"</span>])
+    <span class="keyword">return</span> {<span class="string">"messages"</span>: [response]}
+
+<span class="comment"># 4. Build the Network Graph</span>
+graph_builder = StateGraph(State)
+
+<span class="comment"># Add our Nodes (Actors)</span>
+graph_builder.add_node(<span class="string">"agent"</span>, agent_node)
+graph_builder.add_node(<span class="string">"tools"</span>, ToolNode(tools)) <span class="comment"># Auto-executes any tools the LLM called</span>
+
+<span class="comment"># Draw the Map (Edges)</span>
+graph_builder.add_edge(START, <span class="string">"agent"</span>)
+
+<span class="comment"># Conditional Routing: If LLM called a tool => go to "tools" node. Else => STOP.</span>
+graph_builder.add_conditional_edges(<span class="string">"agent"</span>, tools_condition)
+graph_builder.add_edge(<span class="string">"tools"</span>, <span class="string">"agent"</span>) <span class="comment"># After tool runs, loop back to agent</span>
+
+<span class="comment"># Compile the app!</span>
+app = graph_builder.compile()</code></pre>
+        </div>
+
+        <div class="glass-card">
+            <h2>The Massive Advantage</h2>
+            <p>In the migration code above, the LLM isn't "hallucinating" a text string like `Action: add`. Instead, the `bind_tools()` function translates your Python tools into strict JSON schemas directly inside the Groq model's neural layers natively. The LangGraph `ToolNode` automatically executes the function flawlessly without parsing errors, bundles the result into an `Observation` message, and loops back into the `agent_node`!</p>
+            <p>This removes 100% of the Pydantic type validation string issues we got during the ReAct logic, and gives you absolute granular control over the step-by-step logic map.</p>
+        </div>
+    </div>
+</body>
+</html>
