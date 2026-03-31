@@ -1,0 +1,31 @@
+# Core (LangChain split modules)
+langchain
+langchain-core
+langchain-community
+
+# Groq LLM
+langchain-groq
+groq
+
+# Embeddings (HuggingFace)
+sentence-transformers
+langchain-huggingface
+
+# Vector store
+faiss-cpu
+chromadb
+
+# Document loading
+pypdf
+
+# API layer (later)
+fastapi
+uvicorn
+
+# Utilities
+python-dotenv
+pydantic
+requests
+
+# Logging
+loguru
