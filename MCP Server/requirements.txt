@@ -1,0 +1,12 @@
+# Core LLM
+langchain-groq
+langchain-core
+pydantic
+
+# MCP SDK (with CLI for transport management)
+mcp[cli]
+fastmcp
+httpx
+
+# Utilities
+python-dotenv
