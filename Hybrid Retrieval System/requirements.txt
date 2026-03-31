@@ -1,0 +1,9 @@
+langchain
+langchain-community
+langchain-huggingface
+rank_bm25
+faiss-cpu
+python-dotenv
+pypdf
+langchain-groq
+pymupdf
